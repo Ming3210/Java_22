@@ -13,25 +13,60 @@ public class Main {
                 new Product(2, "Phone", 800.75),
                 new Product(3, "Tablet", 450.30)
         );
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fileName))) {
-            oos.writeObject(products);
-            System.out.println("da ghi danh sach san pham vao file " + fileName);
-        } catch (IOException e) {
-            System.out.println("loi: khong the ghi vao file " + fileName + ". " + e.getMessage());
-        }
-        List<Product> readProducts = null;
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(fileName))) {
-            readProducts = (List<Product>) ois.readObject();
-            System.out.println("da doc danh sach san pham tu file " + fileName);
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("loi: khong the doc file " + fileName + ". " + e.getMessage());
-        }
+        writeProductsToFile(fileName, products);
+        List<Product> readProducts = readProductsFromFile(fileName);
 
         if (readProducts != null) {
-            System.out.println("\nDanh sach san pham:");
+            System.out.println("\nDanh sách sản phẩm từ file:");
             for (Product p : readProducts) {
-                System.out.println(p.toString());
+                System.out.println(p);
             }
         }
+    }
+
+
+    public static void writeProductsToFile(String fileName, List<Product> products) {
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(new FileOutputStream(fileName));
+            oos.writeObject(products);
+            System.out.println("Đã ghi danh sách sản phẩm vào file: " + fileName);
+        } catch (IOException e) {
+            System.out.println("Lỗi: Không thể ghi vào file " + fileName + ". " + e.getMessage());
+        } finally {
+            try {
+                if (oos != null) {
+                    oos.close();
+                }
+            } catch (IOException e) {
+                System.out.println("Lỗi khi đóng file sau khi ghi: " + e.getMessage());
+            }
+        }
+    }
+
+
+    public static List<Product> readProductsFromFile(String fileName) {
+        ObjectInputStream ois = null;
+        List<Product> products = new ArrayList<>();
+        try {
+            ois = new ObjectInputStream(new FileInputStream(fileName));
+            products = (List<Product>) ois.readObject();
+            System.out.println("Đã đọc danh sách sản phẩm từ file: " + fileName);
+        } catch (FileNotFoundException e) {
+            System.out.println("Lỗi: Không tìm thấy file " + fileName);
+        } catch (IOException e) {
+            System.out.println("Lỗi: Không thể đọc file " + fileName + ". " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.out.println("Lỗi: Dữ liệu trong file không hợp lệ. " + e.getMessage());
+        } finally {
+            try {
+                if (ois != null) {
+                    ois.close();
+                }
+            } catch (IOException e) {
+                System.out.println("Lỗi khi đóng file sau khi đọc: " + e.getMessage());
+            }
+        }
+        return products;
     }
 }

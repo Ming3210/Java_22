@@ -5,15 +5,28 @@ public class B3 {
         String inputFileName = "input.txt";
         String copyFileName = "copy.txt";
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(inputFileName))) {
+        BufferedWriter writer = null;
+        try {
+            writer = new BufferedWriter(new FileWriter(inputFileName));
             writer.write("Đây là nội dung của file input.txt");
             System.out.println("Tệp input.txt đã được tạo với nội dung!");
         } catch (IOException e) {
             System.out.println("Lỗi khi tạo tệp input.txt: " + e.getMessage());
+        } finally {
+            try {
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                System.out.println("Lỗi khi đóng file input.txt: " + e.getMessage());
+            }
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFileName));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(copyFileName))) {
+        BufferedReader reader = null;
+        writer = null;
+        try {
+            reader = new BufferedReader(new FileReader(inputFileName));
+            writer = new BufferedWriter(new FileWriter(copyFileName));
             String line;
             while ((line = reader.readLine()) != null) {
                 writer.write(line);
@@ -22,9 +35,22 @@ public class B3 {
             System.out.println("Nội dung đã được sao chép sang copy.txt!");
         } catch (IOException e) {
             System.out.println("Lỗi khi sao chép tệp: " + e.getMessage());
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+                if (writer != null) {
+                    writer.close();
+                }
+            } catch (IOException e) {
+                System.out.println("Lỗi khi đóng file: " + e.getMessage());
+            }
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(copyFileName))) {
+        reader = null;
+        try {
+            reader = new BufferedReader(new FileReader(copyFileName));
             System.out.println("Nội dung của file copy.txt:");
             String line;
             while ((line = reader.readLine()) != null) {
@@ -32,6 +58,14 @@ public class B3 {
             }
         } catch (IOException e) {
             System.out.println("Lỗi khi đọc tệp copy.txt: " + e.getMessage());
+        } finally {
+            try {
+                if (reader != null) {
+                    reader.close();
+                }
+            } catch (IOException e) {
+                System.out.println("Lỗi khi đóng file copy.txt: " + e.getMessage());
+            }
         }
     }
 }

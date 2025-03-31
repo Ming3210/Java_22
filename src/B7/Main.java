@@ -22,7 +22,9 @@ public class Main {
     public static void createFileWithSampleData(String filename) {
         File file = new File(filename);
         if (!file.exists()) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            BufferedWriter writer = null;
+            try {
+                writer = new BufferedWriter(new FileWriter(file));
                 writer.write("1,AU,Australia\n");
                 writer.write("2,CN,China\n");
                 writer.write("3,AU,Australia\n");
@@ -34,6 +36,14 @@ public class Main {
                 System.out.println("Đã tạo file data.txt với dữ liệu mẫu.");
             } catch (IOException e) {
                 System.out.println("Lỗi khi tạo file: " + e.getMessage());
+            } finally {
+                try {
+                    if (writer != null) {
+                        writer.close();
+                    }
+                } catch (IOException e) {
+                    System.out.println("Lỗi khi đóng file sau khi ghi: " + e.getMessage());
+                }
             }
         }
     }
@@ -45,20 +55,29 @@ public class Main {
             System.out.println("File không tồn tại!");
             return countries;
         }
-        try (Scanner scanner = new Scanner(file)) {
+
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String[] data = scanner.nextLine().split(",");
                 if (data.length == 3) {
-                    int id = Integer.parseInt(data[0].trim());
-                    String code = data[1].trim();
-                    String name = data[2].trim();
-                    countries.add(new Country(id, code, name));
+                    try {
+                        int id = Integer.parseInt(data[0].trim());
+                        String code = data[1].trim();
+                        String name = data[2].trim();
+                        countries.add(new Country(id, code, name));
+                    } catch (NumberFormatException e) {
+                        System.out.println("Lỗi: Dữ liệu không hợp lệ trong dòng - " + String.join(",", data));
+                    }
                 }
             }
         } catch (FileNotFoundException e) {
             System.out.println("Lỗi: Không tìm thấy file!");
-        } catch (NumberFormatException e) {
-            System.out.println("Lỗi: Dữ liệu không hợp lệ!");
+        } finally {
+            if (scanner != null) {
+                scanner.close();
+            }
         }
         return countries;
     }
